@@ -1,0 +1,164 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>AWS Learning — Project 1</title>
+  <style>
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+
+    body {
+      font-family: 'Segoe UI', sans-serif;
+      background: #0a0e1a;
+      color: #e2e8f0;
+      min-height: 100vh;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+    }
+
+    .hero {
+      text-align: center;
+      padding: 40px 20px;
+    }
+
+    .badge {
+      display: inline-block;
+      background: linear-gradient(135deg, #ff9900, #ff6600);
+      color: white;
+      font-size: 12px;
+      font-weight: 700;
+      letter-spacing: 2px;
+      padding: 6px 16px;
+      border-radius: 20px;
+      text-transform: uppercase;
+      margin-bottom: 20px;
+    }
+
+    h1 {
+      font-size: 3rem;
+      font-weight: 800;
+      background: linear-gradient(135deg, #ff9900, #ffffff);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      margin-bottom: 12px;
+    }
+
+    .subtitle {
+      font-size: 1.2rem;
+      color: #94a3b8;
+      margin-bottom: 40px;
+    }
+
+    .arch-box {
+      background: #111827;
+      border: 1px solid #1e293b;
+      border-radius: 16px;
+      padding: 32px 40px;
+      max-width: 640px;
+      width: 100%;
+      text-align: left;
+      margin-bottom: 30px;
+    }
+
+    .arch-box h2 {
+      font-size: 1rem;
+      color: #ff9900;
+      letter-spacing: 1px;
+      text-transform: uppercase;
+      margin-bottom: 20px;
+    }
+
+    .flow {
+      font-family: monospace;
+      font-size: 0.9rem;
+      line-height: 2;
+      color: #cbd5e1;
+    }
+
+    .flow .highlight { color: #ff9900; font-weight: bold; }
+    .flow .arrow { color: #4ade80; }
+
+    .cards {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(160px, 1fr));
+      gap: 16px;
+      max-width: 640px;
+      width: 100%;
+    }
+
+    .card {
+      background: #111827;
+      border: 1px solid #1e293b;
+      border-radius: 12px;
+      padding: 20px;
+      text-align: center;
+      transition: transform 0.2s, border-color 0.2s;
+    }
+
+    .card:hover {
+      transform: translateY(-4px);
+      border-color: #ff9900;
+    }
+
+    .card .icon { font-size: 2rem; margin-bottom: 8px; }
+    .card .service { font-size: 0.85rem; font-weight: 700; color: #ff9900; }
+    .card .desc { font-size: 0.75rem; color: #64748b; margin-top: 4px; }
+
+    .footer {
+      margin-top: 40px;
+      font-size: 0.8rem;
+      color: #334155;
+    }
+
+    .env-badge {
+      background: #0f3443;
+      border: 1px solid #0ea5e9;
+      color: #38bdf8;
+      padding: 4px 12px;
+      border-radius: 8px;
+    }
+  </style>
+</head>
+<body>
+  <section class="hero">
+    <div class="badge">AWS Learning</div>
+    <h1>Static Website on AWS</h1>
+    <p class="subtitle">Hosted on S3 · Delivered via CloudFront CDN · HTTPS via ACM</p>
+
+    <div class="arch-box">
+      <h2>Architecture Flow</h2>
+      <div class="flow">
+        <span class="highlight">User</span> <span class="arrow">→</span>
+        <span class="highlight">CloudFront</span> <span class="arrow">→</span>
+        <span class="highlight">S3 Bucket</span> (Origin)<br />
+        <span class="highlight">Route 53</span> → DNS<br />
+        <span class="highlight">ACM</span> → SSL Certificate
+      </div>
+    </div>
+
+    <div class="cards">
+      <div class="card">
+        <div class="icon">🌎</div>
+        <div class="service">S3</div>
+        <div class="desc">Static Website Origin</div>
+      </div>
+      <div class="card">
+        <div class="icon">⚡</div>
+        <div class="service">CloudFront</div>
+        <div class="desc">Global Edge Delivery</div>
+      </div>
+      <div class="card">
+        <div class="icon">🔐</div>
+        <div class="service">ACM</div>
+        <div class="desc">HTTPS Certificate</div>
+      </div>
+    </div>
+
+    <div class="footer">
+      <span class="env-badge">Project 1</span>
+    </div>
+  </section>
+</body>
+</html>
