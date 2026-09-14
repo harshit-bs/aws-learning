@@ -1,0 +1,93 @@
+name: Deploy App to EC2 via ASG
+
+on:
+  push:
+    branches: [main]
+    paths:
+      - 'project-2-ec2-alb-asg/app/**'
+  workflow_dispatch:
+
+env:
+  AWS_REGION: us-east-1
+
+jobs:
+  deploy:
+    name: 🚀 Deploy to EC2 (Rolling via ASG)
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: 📥 Checkout Code
+        uses: actions/checkout@v4
+
+      - name: 🔐 Configure AWS Credentials
+        uses: aws-actions/configure-aws-credentials@v4
+        with:
+          aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
+          aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+          aws-region: ${{ env.AWS_REGION }}
+
+      # App files S3 pe upload karo (EC2 wahan se download karega)
+      - name: 📦 Package & Upload App to S3
+        run: |
+          cd project-2-ec2-alb-asg/app
+          tar -czf /tmp/app.tar.gz .
+          aws s3 cp /tmp/app.tar.gz s3://${{ secrets.DEPLOY_BUCKET }}/app.tar.gz
+          echo "✅ App uploaded to S3!"
+
+      # SSM se sabhi running EC2s pe deploy karo
+      - name: 🖥️ Deploy to All EC2 Instances via SSM
+        run: |
+          ASG_NAME="${{ secrets.ASG_NAME }}"
+
+          # Running instances ka list lo
+          INSTANCE_IDS=$(aws autoscaling describe-auto-scaling-groups \
+            --auto-scaling-group-names $ASG_NAME \
+            --query 'AutoScalingGroups[0].Instances[?LifecycleState==`InService`].InstanceId' \
+            --output text)
+
+          echo "🖥️ Deploying to instances: $INSTANCE_IDS"
+
+          # SSM Run Command — har EC2 pe ye script chalao
+          CMD_ID=$(aws ssm send-command \
+            --instance-ids $INSTANCE_IDS \
+            --document-name "AWS-RunShellScript" \
+            --parameters 'commands=[
+              "aws s3 cp s3://${{ secrets.DEPLOY_BUCKET }}/app.tar.gz /tmp/app.tar.gz",
+              "tar -xzf /tmp/app.tar.gz -C /var/app/",
+              "cd /var/app && npm install --production",
+              "systemctl restart nodeapp",
+              "systemctl is-active nodeapp"
+            ]' \
+            --query 'Command.CommandId' \
+            --output text)
+
+          echo "SSM Command ID: $CMD_ID"
+
+          # Wait for completion
+          aws ssm wait command-executed \
+            --command-id $CMD_ID \
+            --instance-id $(echo $INSTANCE_IDS | awk '{print $1}')
+
+          echo "✅ Deployment complete on all instances!"
+
+      - name: 🏥 Verify ALB Health
+        run: |
+          ALB_URL="${{ secrets.ALB_URL }}"
+          sleep 10
+          STATUS=$(curl -s -o /dev/null -w "%{http_code}" $ALB_URL/health)
+          if [ "$STATUS" = "200" ]; then
+            echo "✅ ALB Health Check: PASSING ($STATUS)"
+          else
+            echo "❌ ALB Health Check: FAILING ($STATUS)"
+            exit 1
+          fi
+
+      - name: 📊 Deployment Summary
+        run: |
+          echo "## 🚀 EC2 Deployment Successful!" >> $GITHUB_STEP_SUMMARY
+          echo "| Item | Value |" >> $GITHUB_STEP_SUMMARY
+          echo "|------|-------|" >> $GITHUB_STEP_SUMMARY
+          echo "| ASG | ${{ secrets.ASG_NAME }} |" >> $GITHUB_STEP_SUMMARY
+          echo "| ALB URL | ${{ secrets.ALB_URL }} |" >> $GITHUB_STEP_SUMMARY
+          echo "| Deploy Method | SSM Run Command |" >> $GITHUB_STEP_SUMMARY
+          echo "| Deployed At | $(date -u) |" >> $GITHUB_STEP_SUMMARY
