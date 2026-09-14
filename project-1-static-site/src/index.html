@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-  <title>AWS Learning — Project 1</title>
+  <title>AWS Learning — Project 1 | v2.0 🚀</title>
   <style>
     * { margin: 0; padding: 0; box-sizing: border-box; }
 
@@ -18,9 +18,30 @@
       justify-content: center;
     }
 
+    /* ── NEW v2: Animated top banner ── */
+    .ci-banner {
+      position: fixed;
+      top: 0; left: 0; right: 0;
+      background: linear-gradient(90deg, #1a1a2e, #16213e, #0f3460, #16213e, #1a1a2e);
+      background-size: 300% 100%;
+      animation: slideBg 4s linear infinite;
+      padding: 10px;
+      text-align: center;
+      font-size: 0.8rem;
+      color: #4ade80;
+      font-family: monospace;
+      letter-spacing: 1px;
+      border-bottom: 1px solid #1e3a5f;
+      z-index: 100;
+    }
+    @keyframes slideBg {
+      0%   { background-position: 0% 0%; }
+      100% { background-position: 300% 0%; }
+    }
+
     .hero {
       text-align: center;
-      padding: 40px 20px;
+      padding: 80px 20px 40px;  /* top padding extra for banner */
     }
 
     .badge {
@@ -36,6 +57,21 @@
       margin-bottom: 20px;
     }
 
+    /* ── NEW v2: Version pill ── */
+    .version-pill {
+      display: inline-block;
+      background: #0d2137;
+      border: 1px solid #4ade80;
+      color: #4ade80;
+      font-size: 11px;
+      font-weight: 700;
+      padding: 4px 12px;
+      border-radius: 20px;
+      margin-left: 10px;
+      font-family: monospace;
+      vertical-align: middle;
+    }
+
     h1 {
       font-size: 3rem;
       font-weight: 800;
@@ -46,9 +82,22 @@
     }
 
     .subtitle {
-      font-size: 1.2rem;
+      font-size: 1.1rem;
       color: #94a3b8;
-      margin-bottom: 40px;
+      margin-bottom: 14px;
+    }
+
+    /* ── NEW v2: Deployed info line ── */
+    .deploy-info {
+      font-size: 0.8rem;
+      color: #4ade80;
+      font-family: monospace;
+      margin-bottom: 36px;
+      background: #0a1f0a;
+      border: 1px solid #166534;
+      display: inline-block;
+      padding: 6px 16px;
+      border-radius: 8px;
     }
 
     .arch-box {
@@ -56,7 +105,7 @@
       border: 1px solid #1e293b;
       border-radius: 16px;
       padding: 32px 40px;
-      max-width: 640px;
+      max-width: 660px;
       width: 100%;
       text-align: left;
       margin-bottom: 30px;
@@ -72,20 +121,54 @@
 
     .flow {
       font-family: monospace;
-      font-size: 0.9rem;
-      line-height: 2;
+      font-size: 0.88rem;
+      line-height: 2.2;
       color: #cbd5e1;
     }
-
     .flow .highlight { color: #ff9900; font-weight: bold; }
-    .flow .arrow { color: #4ade80; }
+    .flow .arrow     { color: #4ade80; }
+    .flow .note      { color: #64748b; font-size: 0.78rem; }
+
+    /* ── NEW v2: CI/CD flow box ── */
+    .cicd-box {
+      background: #0a1628;
+      border: 1px solid #1e3a5f;
+      border-radius: 16px;
+      padding: 28px 40px;
+      max-width: 660px;
+      width: 100%;
+      text-align: left;
+      margin-bottom: 30px;
+    }
+    .cicd-box h2 {
+      font-size: 1rem;
+      color: #38bdf8;
+      letter-spacing: 1px;
+      text-transform: uppercase;
+      margin-bottom: 20px;
+    }
+    .pipeline-step {
+      display: flex;
+      align-items: center;
+      gap: 14px;
+      padding: 10px 0;
+      border-bottom: 1px solid #1e293b;
+      font-family: monospace;
+      font-size: 0.85rem;
+    }
+    .pipeline-step:last-child { border-bottom: none; }
+    .step-icon  { font-size: 1.2rem; width: 30px; text-align: center; }
+    .step-label { color: #e2e8f0; flex: 1; }
+    .step-time  { color: #64748b; font-size: 0.75rem; }
+    .step-done  { color: #4ade80; font-weight: bold; }
 
     .cards {
       display: grid;
-      grid-template-columns: repeat(auto-fit, minmax(160px, 1fr));
-      gap: 16px;
-      max-width: 640px;
+      grid-template-columns: repeat(auto-fit, minmax(140px, 1fr));
+      gap: 14px;
+      max-width: 660px;
       width: 100%;
+      margin-bottom: 30px;
     }
 
     .card {
@@ -96,20 +179,39 @@
       text-align: center;
       transition: transform 0.2s, border-color 0.2s;
     }
-
     .card:hover {
       transform: translateY(-4px);
       border-color: #ff9900;
     }
+    .card .icon    { font-size: 2rem; margin-bottom: 8px; }
+    .card .service { font-size: 0.82rem; font-weight: 700; color: #ff9900; }
+    .card .desc    { font-size: 0.72rem; color: #64748b; margin-top: 4px; }
 
-    .card .icon { font-size: 2rem; margin-bottom: 8px; }
-    .card .service { font-size: 0.85rem; font-weight: 700; color: #ff9900; }
-    .card .desc { font-size: 0.75rem; color: #64748b; margin-top: 4px; }
+    /* ── NEW v2: Stats row ── */
+    .stats {
+      display: flex;
+      gap: 20px;
+      max-width: 660px;
+      width: 100%;
+      margin-bottom: 30px;
+    }
+    .stat-card {
+      flex: 1;
+      background: #111827;
+      border: 1px solid #1e293b;
+      border-radius: 12px;
+      padding: 18px;
+      text-align: center;
+    }
+    .stat-card .stat-num  { font-size: 1.8rem; font-weight: 800; color: #ff9900; }
+    .stat-card .stat-label{ font-size: 0.72rem; color: #64748b; margin-top: 4px; }
 
     .footer {
-      margin-top: 40px;
-      font-size: 0.8rem;
+      margin-top: 10px;
+      font-size: 0.75rem;
       color: #334155;
+      text-align: center;
+      padding-bottom: 30px;
     }
 
     .env-badge {
@@ -118,47 +220,162 @@
       color: #38bdf8;
       padding: 4px 12px;
       border-radius: 8px;
+      font-size: 0.75rem;
+      font-family: monospace;
+      margin: 4px;
+      display: inline-block;
     }
   </style>
 </head>
 <body>
-  <section class="hero">
-    <div class="badge">AWS Learning</div>
-    <h1>Static Website on AWS</h1>
-    <p class="subtitle">Hosted on S3 · Delivered via CloudFront CDN · HTTPS via ACM</p>
 
+  <!-- NEW v2: Animated CI/CD Banner -->
+  <div class="ci-banner">
+    ✅ &nbsp; Deployed via GitHub Actions CI/CD &nbsp;·&nbsp; S3 Synced &nbsp;·&nbsp; CloudFront Cache Invalidated &nbsp;·&nbsp; 🚀 v2.0 LIVE
+  </div>
+
+  <div class="hero">
+
+    <div class="badge">🚀 AWS Learning</div>
+    <span class="version-pill">v2.0 — CI/CD Deployed</span>
+
+    <h1>Static Site on AWS</h1>
+    <p class="subtitle">S3 · CloudFront CDN · HTTPS · GitHub Actions CI/CD</p>
+
+    <!-- NEW v2: Deploy timestamp info -->
+    <div class="deploy-info">
+      ✅ Last deployed by: GitHub Actions &nbsp;|&nbsp; Pipeline: 13s &nbsp;|&nbsp; Cache: Invalidated
+    </div>
+
+    <!-- Architecture Flow -->
     <div class="arch-box">
-      <h2>Architecture Flow</h2>
+      <h2>🏗️ Architecture Flow</h2>
       <div class="flow">
-        <span class="highlight">User</span> <span class="arrow">→</span>
-        <span class="highlight">CloudFront</span> <span class="arrow">→</span>
-        <span class="highlight">S3 Bucket</span> (Origin)<br />
-        <span class="highlight">Route 53</span> → DNS<br />
-        <span class="highlight">ACM</span> → SSL Certificate
+        <span class="highlight">User Browser</span>
+        <span class="arrow"> ──► </span>
+        <span class="highlight">Route 53</span>
+        <span class="note"> (DNS lookup)</span><br/>
+
+        &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+        <span class="arrow"> ──► </span>
+        <span class="highlight">CloudFront CDN</span>
+        <span class="note"> (450+ edge locations)</span><br/>
+
+        &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+        <span class="arrow"> ──► </span>
+        <span class="note">[Cache HIT ⚡ &lt;5ms]</span><br/>
+
+        &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+        <span class="arrow"> ──► </span>
+        <span class="highlight">S3 Bucket</span>
+        <span class="note"> [Cache MISS ~200ms]</span><br/>
+
+        &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+        <span class="note">(OAC — private access only)</span>
       </div>
     </div>
 
+    <!-- NEW v2: CI/CD Pipeline Visualization -->
+    <div class="cicd-box">
+      <h2>🔄 CI/CD Pipeline — GitHub Actions</h2>
+
+      <div class="pipeline-step">
+        <div class="step-icon">📥</div>
+        <div class="step-label">Checkout Code</div>
+        <div class="step-time">2s</div>
+        <div class="step-done">✅</div>
+      </div>
+      <div class="pipeline-step">
+        <div class="step-icon">🔐</div>
+        <div class="step-label">AWS Login via OIDC (no keys!)</div>
+        <div class="step-time">3s</div>
+        <div class="step-done">✅</div>
+      </div>
+      <div class="pipeline-step">
+        <div class="step-icon">📤</div>
+        <div class="step-label">Sync Files → S3 Bucket</div>
+        <div class="step-time">5s</div>
+        <div class="step-done">✅</div>
+      </div>
+      <div class="pipeline-step">
+        <div class="step-icon">⚡</div>
+        <div class="step-label">CloudFront Cache Invalidation</div>
+        <div class="step-time">2s</div>
+        <div class="step-done">✅</div>
+      </div>
+      <div class="pipeline-step">
+        <div class="step-icon">📊</div>
+        <div class="step-label">Deployment Summary Posted</div>
+        <div class="step-time">1s</div>
+        <div class="step-done">✅</div>
+      </div>
+    </div>
+
+    <!-- NEW v2: Stats -->
+    <div class="stats">
+      <div class="stat-card">
+        <div class="stat-num">450+</div>
+        <div class="stat-label">Edge Locations</div>
+      </div>
+      <div class="stat-card">
+        <div class="stat-num">&lt;5ms</div>
+        <div class="stat-label">Cache Hit Latency</div>
+      </div>
+      <div class="stat-card">
+        <div class="stat-num">13s</div>
+        <div class="stat-label">Deploy Time</div>
+      </div>
+      <div class="stat-card">
+        <div class="stat-num">$0</div>
+        <div class="stat-label">Free Tier Cost</div>
+      </div>
+    </div>
+
+    <!-- Service Cards -->
     <div class="cards">
       <div class="card">
-        <div class="icon">🌎</div>
-        <div class="service">S3</div>
-        <div class="desc">Static Website Origin</div>
+        <div class="icon">🪣</div>
+        <div class="service">Amazon S3</div>
+        <div class="desc">Private origin · Encrypted · Versioned</div>
       </div>
       <div class="card">
         <div class="icon">⚡</div>
         <div class="service">CloudFront</div>
-        <div class="desc">Global Edge Delivery</div>
+        <div class="desc">Global CDN · OAC · Cache</div>
       </div>
       <div class="card">
-        <div class="icon">🔐</div>
+        <div class="icon">🔒</div>
         <div class="service">ACM</div>
-        <div class="desc">HTTPS Certificate</div>
+        <div class="desc">Free HTTPS · Auto renew</div>
+      </div>
+      <div class="card">
+        <div class="icon">🌐</div>
+        <div class="service">Route 53</div>
+        <div class="desc">DNS · Health checks</div>
+      </div>
+      <div class="card">
+        <div class="icon">🤖</div>
+        <div class="service">GitHub Actions</div>
+        <div class="desc">CI/CD · OIDC · Auto deploy</div>
       </div>
     </div>
 
-    <div class="footer">
-      <span class="env-badge">Project 1</span>
+    <!-- Env badges -->
+    <div>
+      <span class="env-badge">Region: us-east-1</span>
+      <span class="env-badge">Cache: CloudFront Edge</span>
+      <span class="env-badge">Protocol: HTTPS</span>
+      <span class="env-badge">CI/CD: GitHub Actions ✅</span>
+      <span class="env-badge">v2.0 🚀</span>
     </div>
-  </section>
+
+  </div>
+
+  <div class="footer">
+    AWS Learning Series · Project 1 of 6 &nbsp;·&nbsp;
+    Built with Terraform + GitHub Actions &nbsp;·&nbsp;
+    <strong style="color:#ff9900;">v2.0 — CI/CD Deployed</strong>
+  </div>
+
 </body>
 </html>
