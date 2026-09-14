@@ -1,0 +1,114 @@
+# ============================================================
+# GitHub Actions CI/CD Pipeline — Project 1
+# Trigger: Push to main branch
+# Steps:
+#   1. Sync src/ files to S3 bucket
+#   2. Invalidate CloudFront cache (so users get fresh content)
+# ============================================================
+
+name: Deploy Static Site to S3 + CloudFront
+
+on:
+  push:
+    branches:
+      - main
+    paths:
+      - 'project-1-static-site/src/**'   # Only trigger when src files change
+
+  workflow_dispatch:   # Allow manual trigger from GitHub UI
+
+env:
+  AWS_REGION: us-east-1
+
+jobs:
+  # ──────────────────────────────────────────────────
+  # JOB 1: Deploy to S3 + Invalidate CloudFront
+  # ──────────────────────────────────────────────────
+  deploy:
+    name: 🚀 Deploy to S3 + CloudFront
+    runs-on: ubuntu-latest
+
+    permissions:
+      id-token: write   # Required for OIDC (passwordless AWS auth)
+      contents: read
+
+    steps:
+      # Step 1: Checkout the repo
+      - name: 📥 Checkout Code
+        uses: actions/checkout@v4
+
+      # Step 2: Configure AWS credentials via OIDC (no hardcoded keys!)
+      # OIDC = GitHub proves its identity to AWS without a password
+      - name: 🔐 Configure AWS Credentials (OIDC)
+        uses: aws-actions/configure-aws-credentials@v4
+        with:
+          role-to-assume: ${{ secrets.AWS_OIDC_ROLE_ARN }}
+          aws-region: ${{ env.AWS_REGION }}
+
+      # Step 3: Sync src/ files to S3
+      # --delete removes files from S3 that no longer exist in src/
+      # --cache-control sets browser caching headers
+      - name: 📤 Upload Files to S3
+        run: |
+          echo "🪣 Syncing files to S3 bucket: ${{ secrets.S3_BUCKET_NAME }}"
+
+          # Upload HTML files (no cache — always fresh)
+          aws s3 sync project-1-static-site/src/ s3://${{ secrets.S3_BUCKET_NAME }}/ \
+            --delete \
+            --exclude "*" \
+            --include "*.html" \
+            --cache-control "no-cache, no-store, must-revalidate" \
+            --content-type "text/html"
+
+          # Upload CSS files (cache 1 year — use content hash for versioning)
+          aws s3 sync project-1-static-site/src/ s3://${{ secrets.S3_BUCKET_NAME }}/ \
+            --delete \
+            --exclude "*" \
+            --include "*.css" \
+            --cache-control "public, max-age=31536000, immutable"
+
+          # Upload JS files (cache 1 year)
+          aws s3 sync project-1-static-site/src/ s3://${{ secrets.S3_BUCKET_NAME }}/ \
+            --delete \
+            --exclude "*" \
+            --include "*.js" \
+            --cache-control "public, max-age=31536000, immutable"
+
+          # Upload images (cache 7 days)
+          aws s3 sync project-1-static-site/src/ s3://${{ secrets.S3_BUCKET_NAME }}/ \
+            --delete \
+            --exclude "*" \
+            --include "*.png" \
+            --include "*.jpg" \
+            --include "*.svg" \
+            --cache-control "public, max-age=604800"
+
+          echo "✅ S3 sync complete!"
+
+      # Step 4: Invalidate CloudFront cache
+      # Without this, users would get stale cached files for up to 24 hours!
+      - name: 🔄 Invalidate CloudFront Cache
+        run: |
+          echo "⚡ Creating CloudFront invalidation for distribution: ${{ secrets.CLOUDFRONT_DISTRIBUTION_ID }}"
+
+          INVALIDATION_ID=$(aws cloudfront create-invalidation \
+            --distribution-id ${{ secrets.CLOUDFRONT_DISTRIBUTION_ID }} \
+            --paths "/*" \
+            --query 'Invalidation.Id' \
+            --output text)
+
+          echo "✅ Invalidation created: $INVALIDATION_ID"
+          echo "🌍 Site live at: https://${{ secrets.CLOUDFRONT_DOMAIN }}"
+
+      # Step 5: Post deployment summary to GitHub Job Summary
+      - name: 📊 Deployment Summary
+        run: |
+          echo "## 🚀 Deployment Successful!" >> $GITHUB_STEP_SUMMARY
+          echo "" >> $GITHUB_STEP_SUMMARY
+          echo "| Item | Value |" >> $GITHUB_STEP_SUMMARY
+          echo "|------|-------|" >> $GITHUB_STEP_SUMMARY
+          echo "| S3 Bucket | \`${{ secrets.S3_BUCKET_NAME }}\` |" >> $GITHUB_STEP_SUMMARY
+          echo "| CloudFront ID | \`${{ secrets.CLOUDFRONT_DISTRIBUTION_ID }}\` |" >> $GITHUB_STEP_SUMMARY
+          echo "| Live URL | https://${{ secrets.CLOUDFRONT_DOMAIN }} |" >> $GITHUB_STEP_SUMMARY
+          echo "| Deployed At | $(date -u) |" >> $GITHUB_STEP_SUMMARY
+          echo "| Triggered By | ${{ github.actor }} |" >> $GITHUB_STEP_SUMMARY
