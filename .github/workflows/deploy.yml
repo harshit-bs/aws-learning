@@ -29,7 +29,6 @@ jobs:
     runs-on: ubuntu-latest
 
     permissions:
-      id-token: write   # Required for OIDC (passwordless AWS auth)
       contents: read
 
     steps:
@@ -37,12 +36,12 @@ jobs:
       - name: 📥 Checkout Code
         uses: actions/checkout@v4
 
-      # Step 2: Configure AWS credentials via OIDC (no hardcoded keys!)
-      # OIDC = GitHub proves its identity to AWS without a password
-      - name: 🔐 Configure AWS Credentials (OIDC)
+      # Step 2: Configure AWS credentials via Access Keys
+      - name: 🔐 Configure AWS Credentials
         uses: aws-actions/configure-aws-credentials@v4
         with:
-          role-to-assume: ${{ secrets.AWS_OIDC_ROLE_ARN }}
+          aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
+          aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
           aws-region: ${{ env.AWS_REGION }}
 
       # Step 3: Sync src/ files to S3
